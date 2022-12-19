@@ -9,17 +9,17 @@ let ctx = canvas.getContext("2d");
 const accessCamera = () => {
   navigator.mediaDevices
     .getUserMedia({
-      video: { width: 500, height: 400 },
+      video: { width: 600, height: 500 },
       audio: false,
     })
     .then((stream) => {
-      video.srcObject = stream; 
+      video.srcObject = stream;
     });
 };
 
 const detectFaces = async () => {
   const prediction = await model.estimateFaces(video, false);
-  ctx.drawImage(video, 0, 0, 500, 400);
+  ctx.drawImage(video, 0, 0, 600, 500);
 
   prediction.forEach((predictions) => {
 
@@ -37,12 +37,16 @@ const detectFaces = async () => {
     // but since the blazeface models only returns the coordinates  
     // so we have to subtract them in order to get the width and height
     ctx.stroke();
+    ctx.font = "50px sans";
+    ctx.fillStyle = "yellow";
+    if (prediction[0]?.probability) {
+      ctx.fillText(Number.parseFloat(prediction[0]?.probability).toFixed(5), predictions.bottomRight[0] / 2, predictions.bottomRight[1] + 50);
+    }
+
   });
-  if (prediction[0]?.probability) {
-    ctx.fillText(Number.parseFloat(prediction[0]?.probability).toFixed(5), 10, 50);
-  }
-  else {
-    ctx.fillText("yüz algılanmadı", 10, 50)
+  if (prediction[0]?.probability == undefined) {
+    ctx.fillStyle = "red";
+    ctx.fillText("yüz algılanmadı", canvas.width / 4, canvas.height / 2);
   }
 };
 
